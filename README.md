@@ -1,5 +1,5 @@
-MariaDB Galera
-==============
+MariaDB Galera Cluster for Docker
+=================================
 
 A reasonably simple Ubuntu 14.04 LTS container with the pieces to form
 a MariaDB 10 Galera cluster. It's based on https://github.com/neildunbar/mariadb55 based on Nick Stenning's container for MariaDB 5.5, and adds in default support for X.509 based administrative authentication.
@@ -28,7 +28,7 @@ contain 3 files:
 
 * a CA certificate (this can be a real CA certificate, or just a
   simple test one, generated via something like TinyCA. This CA
-  file should be called `ca.pem`. [^1]
+  file should be called `ca.pem`.
 * an SSL private key. This should be set to ownership mode 0600 (or
   even 0400). The file needs to be called `server-key.pem`.
 * an SSL server certificate. The CN component of the subject name on
@@ -36,6 +36,11 @@ contain 3 files:
   the end point for the database service. Note that you can have
   multiple host names by using the subjectAltName X.509 v3 extension
   on the certificate. This file needs to be called `server-cert.pem`.
+
+```
+chmod +x ./generate-keys.sh
+./generate-keys.ssh
+```
 
 The data volume must be mounted at the container directory
 `/var/lib/mysql`.
@@ -46,16 +51,12 @@ mkdir /data/mysql-ssl
 ```
 The SSL volume must be mounted (ideally read-only) at the container
 directory `/etc/ssl/mysql`.
-```
-chmod +x ./generate-keys.sh
-./generate-keys.ssh
-```
+
 Within the SSL volume there should also be a directory called `root`
 which will contain a set of *client* certificates with names like
 `joe-root.pem`, `amy-root.pem`, `superman.pem` and so on. These names
 will be registered as root capable users from any network host, with
 no passwords, but only available using the SSL client certificates.
-[^2]
 
 The remote root access is derived from a set of X.509 certificates
 which will be used via SSL to authenticate the user, so that passwords
@@ -177,9 +178,10 @@ stop and restart the primary component as just another node in the
 cluster.
 
 (On the server running the primary node)
-
+```
 sudo docker stop $DBID
-
+```
+```
 DBID=$(sudo docker run -d /data/mysql:/var/lib/mysql \
        -v /data/mysql-ssl:/etc/ssl/mysql \
        -p 3306:3306 -p 4567:4567 -p 4444:4444 \
@@ -187,10 +189,6 @@ DBID=$(sudo docker run -d /data/mysql:/var/lib/mysql \
        -e NODE=1 \
        -e NODE_ADDR=my.host.name epheo/mariadb-docker-cluster \
        mariadb-start)
-
-[^1]: http://tinyca.sm-zone.net
-
-[^2]: Note that the root user certificates _must_ be signed by the
-same CA as the one signing the server certificate.
+```
 
 *All credits to https://github.com/neildunbar for the doc
