@@ -6,24 +6,24 @@ a MariaDB 10 Galera cluster. It's based on https://github.com/neildunbar/mariadb
 
 (Repeating the warning from Nick S)
 
-**NB**: Please be aware that by default docker will make the MariaDB
-port accessible from anywhere if the host firewall is unconfigured. It
+**SECURITY**: Please be aware that by default docker will make the MariaDB
+port accessible from anywhere if the host **firewall** is unconfigured. It
 also exposes the Galera wsrep port (by default 4567) globally, as well
 as the snapshot transfer port (default 4444). Care should be taken,
 perhaps, to firewall off these ports at the docker root level. While
 port 3306 might need wider exposure, ports 4567 and 4444 have no need
 to be exposed to anything other than members of the cluster.
 
-The root password for the first node (and therefore the entire
+The **root password** for the first node (and therefore the entire
 cluster) is randomly generated. This password can only be used to
 contact the server along the unix domain socket (ie, the default
 localhost connection).
 
-The container needs to import two volumes (one read/write, the other
+The container needs to import two **volumes** (one read/write, the other
 read only). The first volume is the data volume, where the actual
 MySQL data is stored.
 
-The second volume (read-only) is the SSL container, which should
+The second volume (read-only) is the **SSL container**, which should
 contain 3 files:
 
 * a CA certificate (this can be a real CA certificate, or just a
@@ -39,10 +39,17 @@ contain 3 files:
 
 The data volume must be mounted at the container directory
 `/var/lib/mysql`.
+```
+mkdir -p /data/mysql
+mkdir /data/mysql-ssl
 
+```
 The SSL volume must be mounted (ideally read-only) at the container
 directory `/etc/ssl/mysql`.
-
+```
+chmod +x ./generate-keys.sh
+./generate-keys.ssh
+```
 Within the SSL volume there should also be a directory called `root`
 which will contain a set of *client* certificates with names like
 `joe-root.pem`, `amy-root.pem`, `superman.pem` and so on. These names
@@ -66,10 +73,10 @@ $ cat _/path/to/mysql-dir/_rootpw.pem | openssl smime -decrypt -inkey
 _path/to/private-key.pem_
 
 e.g.
-
+```
 cat /data/mysql-node-1/rootpw.pem | openssl smime -decrypt -inkey
 ~/ssl-keys/joe-root-key.pem
-
+```
 Note that this prints the root password to standard output. You might
 feel better outputting the key into a keyutils key, e.g.
 
@@ -82,8 +89,7 @@ mysql -uroot -p$(keyctl pipe mysql-root) -h localhost
 
 When your login session ends, the key will then be reaped.
 
-Example Usage
--------------
+## Example Usage
 
 This sets up a 3 node cluster on 3 different servers, all using
 default ports.
@@ -94,12 +100,12 @@ contains the relevant keys, certificates and CA certificates. For the
 first node standup, /data/mysql should be empty.
 
 # Boot the first node in standalone mode #
-
+```
 DBID=$(sudo docker run -d -v /data/mysql:/var/lib/mysql \
        -v /data/mysql-ssl:/etc/ssl/mysql \
        -p 3306:3306 -e CLUSTER=BOOT epheo/mariadb-docker-cluster \
        mariadb-start)
-
+```
 (Note: no need to expose ports 4567 and 4444 - no-one is talking to
 anyone just yet)
 
