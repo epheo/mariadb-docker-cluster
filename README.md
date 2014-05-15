@@ -117,22 +117,22 @@ or not.
 Assuming it went well, continue.
 
 # Stop the standalone mode #
-
+```
 sudo docker stop $DBID
-
+```
 This should (gracefully) stop the standalone mode MariaDB node
 
 # Start the node in Primary Component mode #
 
 To begin the cluster, you need a single node as a catch-all donor.
-
+```
 DBID=$(sudo docker run -d /data/mysql:/var/lib/mysql \
        -v /data/mysql-ssl:/etc/ssl/mysql \
        -p 3306:3306 -p 4567:4567 -p 4444:4444 \
        -e CLUSTER=INIT \
        -e NODE_ADDR=my.host.name epheo/mariadb-docker-cluster \
        mariadb-start)
-
+```
 This should restart the server (with data intact) with the ability to
 use it to populate new nodes to fill out the cluster. Node that the
 primary component has a node number of 1 (this is fixed by scripting).
@@ -150,7 +150,7 @@ nodes are coming online.
 
 For each extra node that you need to turn up, set up the `/data/mysql`
 and `/data/mysql-ssl` directories as per the primary node, and execute
-
+```
 DBID=$(sudo docker run -d /data/mysql:/var/lib/mysql \
        -v /data/mysql-ssl:/etc/ssl/mysql \
        -p 3306:3306 -p 4567:4567 -p 4444:4444 \
@@ -158,7 +158,7 @@ DBID=$(sudo docker run -d /data/mysql:/var/lib/mysql \
        -e NODE=<node number> \
        -e NODE_ADDR=my.host.name epheo/mariadb-docker-cluster \
        mariadb-start)
-
+```
 where `<node number>` is some integer above 1, ideally sequential. The
 `his.host.name`, `her.host.name` etc. should be the other nodes in the
 cluster. You don't need to list all the nodes in the cluster - the
