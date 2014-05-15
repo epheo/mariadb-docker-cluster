@@ -1,10 +1,8 @@
-MariaDB 5.5 Galera
-==================
+MariaDB Galera
+==============
 
-A reasonably simple Ubuntu 12.04 LTS container with the pieces to form
-a MariaDB 5.5 Galera cluster. It's based on Nick Stenning's container
-for MariaDB 5.5, and adds in default support for X.509 based
-administrative authentication.
+A reasonably simple Ubuntu 14.04 LTS container with the pieces to form
+a MariaDB 10 Galera cluster. It's based on https://github.com/neildunbar/mariadb55 based on Nick Stenning's container for MariaDB 5.5, and adds in default support for X.509 based administrative authentication.
 
 (Repeating the warning from Nick S)
 
@@ -99,7 +97,7 @@ first node standup, /data/mysql should be empty.
 
 DBID=$(sudo docker run -d -v /data/mysql:/var/lib/mysql \
        -v /data/mysql-ssl:/etc/ssl/mysql \
-       -p 3306:3306 -e CLUSTER=BOOT ndunbar/mariadb55 \
+       -p 3306:3306 -e CLUSTER=BOOT epheo/mariadb-docker-cluster \
        mariadb-start)
 
 (Note: no need to expose ports 4567 and 4444 - no-one is talking to
@@ -126,7 +124,7 @@ DBID=$(sudo docker run -d /data/mysql:/var/lib/mysql \
        -v /data/mysql-ssl:/etc/ssl/mysql \
        -p 3306:3306 -p 4567:4567 -p 4444:4444 \
        -e CLUSTER=INIT \
-       -e NODE_ADDR=my.host.name ndunbar/mariadb55 \
+       -e NODE_ADDR=my.host.name epheo/mariadb-docker-cluster \
        mariadb-start)
 
 This should restart the server (with data intact) with the ability to
@@ -152,7 +150,7 @@ DBID=$(sudo docker run -d /data/mysql:/var/lib/mysql \
        -p 3306:3306 -p 4567:4567 -p 4444:4444 \
        -e CLUSTER= my.host.name,his.host.name,her.host.name \
        -e NODE=<node number> \
-       -e NODE_ADDR=my.host.name ndunbar/mariadb55 \
+       -e NODE_ADDR=my.host.name epheo/mariadb-docker-cluster \
        mariadb-start)
 
 where `<node number>` is some integer above 1, ideally sequential. The
@@ -181,10 +179,12 @@ DBID=$(sudo docker run -d /data/mysql:/var/lib/mysql \
        -p 3306:3306 -p 4567:4567 -p 4444:4444 \
        -e CLUSTER= my.host.name,his.host.name,her.host.name \
        -e NODE=1 \
-       -e NODE_ADDR=my.host.name ndunbar/mariadb55 \
+       -e NODE_ADDR=my.host.name epheo/mariadb-docker-cluster \
        mariadb-start)
 
 [^1]: http://tinyca.sm-zone.net
 
 [^2]: Note that the root user certificates _must_ be signed by the
 same CA as the one signing the server certificate.
+
+*All credits to https://github.com/neildunbar for the doc
