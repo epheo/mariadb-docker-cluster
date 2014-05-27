@@ -23,4 +23,5 @@ f.read()
 
 db_container = dockerclient.build(path='.', tag='openstack/mariadb')
 
-dockerclient.start(container, publish_all_ports=True)
+db_container = dockerclient.create_container('openstack/mariadb', name='hello', ports=[4567,4444])
+dockerclient.start(db_container, publish_all_ports=True)

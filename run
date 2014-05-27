@@ -1,8 +1,6 @@
-
-
-DBID=$(sudo docker run -v /data/mysql:/var/lib/mysql \
+DBID=$(sudo docker run -d -v /data/mysql:/var/lib/mysql \
        -v /data/mysql-ssl:/etc/ssl/mysql \
        -p 3306:3306 -p 4567:4567 -p 4444:4444 \
-       -e CLUSTER=INIT \
-       -e NODE_ADDR=node01 openstack/mariadb \
+       -e CLUSTER=INIT -e NODE_ADDR=node01 \
+       openstack/mariadb \
        mariadb-start)
