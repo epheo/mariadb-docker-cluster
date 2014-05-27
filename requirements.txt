@@ -1,0 +1,9 @@
+#!/bin/bash
+
+apt-get install git
+pip install docker-py #https://github.com/dotcloud/docker-py
+
+#https://github.com/jplana/python-etcd
+git clone https://github.com/jplana/python-etcd.git
+cd python-etcd
+python setup.py install

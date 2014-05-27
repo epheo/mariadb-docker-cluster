@@ -14,10 +14,10 @@ RUN add-apt-repository 'deb http://repo.percona.com/apt trusty main'
 # Make apt and MariaDB happy with the docker environment
 #RUN	echo "#!/bin/sh\nexit 101" >/usr/sbin/policy-rc.d
 #RUN	chmod +x /usr/sbin/policy-rc.d
-RUN	cat /proc/mounts >/etc/mtab # ??
+#RUN	cat /proc/mounts >/etc/mtab # ??
 
 # Install MariaDB
-RUN	apt-get -y update
+RUN	LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get -y update
 RUN	LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y iproute mariadb-galera-server galera rsync netcat-openbsd socat pv percona-xtrabackup
 
 # this is for testing - can be commented out later
@@ -31,12 +31,12 @@ ADD bin/wsrep_sst_xtrabackup-v2 	/usr/bin/wsrep_sst_xtrabackup-v2
 RUN	rm -r /var/lib/mysql
 
 # Add config(s) - standalong and cluster mode
-ADD	etc/my-cluster.cnf 			/etc/mysql/my-cluster.cnf
+ADD etc/my-cluster.cnf 			/etc/mysql/my-cluster.cnf
 ADD etc/my-init.cnf 			/etc/mysql/my-init.cnf
 
 
-ADD	bin/mariadb-setrootpassword /usr/bin/mariadb-setrootpassword
-ADD	bin/mariadb-start /usr/bin/mariadb-start
+ADD bin/mariadb-setrootpassword /usr/bin/mariadb-setrootpassword
+ADD bin/mariadb-start /usr/bin/mariadb-start
 
 EXPOSE 3306 4567 4444
 
