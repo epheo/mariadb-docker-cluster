@@ -18,10 +18,7 @@ dockerclient = docker.Client(base_url='unix://var/run/docker.sock',
                   version='1.9',
                   timeout=10)
 
-f = open("Dockerfile", "r+")
-f.read()
+dockerclient.build(path='.', tag='openstack/mariadb')
 
-db_container = dockerclient.build(path='.', tag='openstack/mariadb')
-
-db_container = dockerclient.create_container('openstack/mariadb', name='hello', ports=[4567,4444])
-dockerclient.start(db_container, publish_all_ports=True)
+db_container_id = dockerclient.create_container('openstack/mariadb', environment={'CLUSTER': 'INIT'}, ports=[4567, 3306, 4444])
+dockerclient.start(db_container_id, port_bindings={4567: 4567, 3306:3306, 4444: 4444})
