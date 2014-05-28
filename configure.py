@@ -20,5 +20,22 @@ dockerclient = docker.Client(base_url='unix://var/run/docker.sock',
 
 dockerclient.build(path='.', tag='openstack/mariadb')
 
-db_container_id = dockerclient.create_container('openstack/mariadb', environment={'CLUSTER': 'INIT'}, ports=[4567, 3306, 4444])
-dockerclient.start(db_container_id, port_bindings={4567: 4567, 3306:3306, 4444: 4444})
+db_container_id = dockerclient.create_container('openstack/mariadb', 
+	environment={'CLUSTER': 'INIT', 'NODE_ADDR': 'node01'}, 
+	volumes=['/var/lib/mysql', '/etc/ssl/mysql'],
+	ports=[4567, 3306, 4444])
+
+dockerclient.start(db_container_id, 
+	binds={
+	    '/data/mysql':
+	        {
+	            'bind': '/var/lib/mysql',
+	            'ro': False
+	        },
+	    '/data/mysql-ssl':
+	        {
+	            'bind': '/etc/ssl/mysql',
+	            'ro': True
+	        }
+	},
+	port_bindings={4567: 4567, 3306: 3306, 4444: 4444})
